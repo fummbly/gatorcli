@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -66,11 +67,14 @@ func Read() (Config, error) {
 
 }
 
-func (c *Config) SetUser(username string) {
+func (c *Config) SetUser(username string) error {
+	fmt.Printf("Now logging in as %s\n", username)
 	c.CurrentUsername = username
 	err := write(*c)
 	if err != nil {
-		return
+		return err
 	}
+
+	return nil
 
 }
