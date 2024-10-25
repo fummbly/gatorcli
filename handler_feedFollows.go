@@ -50,5 +50,25 @@ func handlerFollowing(s *state, cmd command, user database.User) error {
 
 	}
 	return nil
+}
 
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("Usage: %s <url>")
+	}
+
+	url := cmd.Args[0]
+
+	err := s.db.DeleteFollow(context.Background(), database.DeleteFollowParams{
+		Name: user.Name,
+		Url:  url,
+	})
+	if err != nil {
+		return fmt.Errorf("Failed to delete follow: %s", err)
+	}
+
+	fmt.Printf("%s has stopped following %s\n", user.Name, url)
+
+	return nil
 }
