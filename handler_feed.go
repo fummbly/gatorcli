@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/fummbly/gatorcli/internal/database"
@@ -20,53 +20,44 @@ func handlerAgg(s *state, cmd command) error {
 		return fmt.Errorf("Failed to parse time: %v", err)
 	}
 
+	log.Printf("Collecting feeds every %s...", timeBetweenRequests)
+
 	ticker := time.NewTicker(timeBetweenRequests)
 	for ; ; <-ticker.C {
-		err := scrapeFeeds(s)
-		if err != nil {
-			return fmt.Errorf("Failed scraping: %v", err)
-		}
-
+		scrapeFeeds(s)
 	}
 
-	return nil
 }
 
-func scrapeFeeds(s *state) error {
+func scrapeFeeds(s *state) {
 	feed, err := s.db.GetNextFeedToFetch(context.Background())
 	if err != nil {
-		return fmt.Errorf("Failed to get feed: %v", err)
+		log.Printf("Failed to get next feed to fectch")
+		return
 	}
 
-	fmt.Printf("Fetching feed: %s\n", feed.Name)
+	log.Printf("Found %s feed to fetch", feed.Name)
+	scrapeFeed(s.db, feed)
 
-	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{
-		ID:        feed.ID,
-		UpdatedAt: time.Now().UTC(),
-		LastFetchedAt: sql.NullTime{
-			Time: time.Now().UTC(),
-		},
-	})
+}
+
+func scrapeFeed(db *database.Queries, feed database.Feed) {
+	_, err := db.MarkFeedFetched(context.Background(), feed.ID)
 	if err != nil {
-		return fmt.Errorf("Failed to mark feed as fetched: %v", err)
-
+		log.Printf("Couldn't mark the feed %s fetched: %v", feed.Name, err)
+		return
 	}
 
-	feedRSS, err := fetchFeed(context.Background(), feed.Url)
+	feedData, err := fetchFeed(context.Background(), feed.Url)
 	if err != nil {
-		return fmt.Errorf("Failed to fetch feed rss: %v", err)
+		log.Printf("Failed to fetch data from feed %s: %v", feed.Name, err)
+		return
 	}
 
-	fmt.Println()
-	fmt.Printf("Title: %s\n", feedRSS.Channel.Title)
-	fmt.Println("=================================")
-	fmt.Println("Items")
-
-	for _, item := range feedRSS.Channel.Item {
-		fmt.Printf(" * %s\n", item.Title)
+	for _, item := range feedData.Channel.Item {
+		fmt.Printf("Found post: %s\n", item.Title)
 	}
-
-	return nil
+	log.Printf("Feed %s collected, %v posts found", feed.Name, len(feedData.Channel.Item))
 
 }
 
