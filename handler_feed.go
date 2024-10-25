@@ -23,14 +23,9 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 2 {
 		return fmt.Errorf("Usage: %s <name> <url", cmd.Name)
-	}
-
-	currUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUsername)
-	if err != nil {
-		return fmt.Errorf("Failed to get current user: %v", err)
 	}
 
 	feedName := cmd.Args[0]
@@ -42,7 +37,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now().UTC(),
 		Name:      feedName,
 		Url:       feedUrl,
-		UserID:    currUser.ID,
+		UserID:    user.ID,
 	})
 	if err != nil {
 		return fmt.Errorf("Failed to create feed: %v", err)
@@ -50,14 +45,14 @@ func handlerAddFeed(s *state, cmd command) error {
 
 	fmt.Println("Feed Successfully created")
 	fmt.Println("===============================")
-	printFeed(feed, currUser)
+	printFeed(feed, user)
 	fmt.Println("===============================")
 
 	follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID:        int32(uuid.New().ID()),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		UserID:    currUser.ID,
+		UserID:    user.ID,
 		FeedID:    feed.ID,
 	})
 	if err != nil {
