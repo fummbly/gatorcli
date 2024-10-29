@@ -151,3 +151,13 @@ func (q *Queries) MarkFeedFetched(ctx context.Context, id int32) (Feed, error) {
 	)
 	return i, err
 }
+
+const removeFeed = `-- name: RemoveFeed :exec
+DELETE FROM feeds
+WHERE id = $1
+`
+
+func (q *Queries) RemoveFeed(ctx context.Context, id int32) error {
+	_, err := q.db.ExecContext(ctx, removeFeed, id)
+	return err
+}

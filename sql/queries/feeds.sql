@@ -31,3 +31,8 @@ RETURNING *;
 SELECT * FROM feeds
 ORDER BY last_fetched_at ASC NULLS FIRST
 LIMIT 1;
+
+-- name: RemoveFeed :exec
+DELETE FROM feeds
+WHERE id = $1;
+--

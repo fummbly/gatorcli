@@ -2,8 +2,10 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/fummbly/gatorcli/internal/database"
@@ -55,9 +57,60 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 	}
 
 	for _, item := range feedData.Channel.Item {
-		fmt.Printf("Found post: %s\n", item.Title)
+		publishedAt := sql.NullTime{}
+		if t, err := time.Parse(time.RFC1123Z, item.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  t,
+				Valid: true,
+			}
+		}
+
+		_, err := db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        int32(uuid.New().ID()),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+			FeedID:    feed.ID,
+			Title:     item.Title,
+			Description: sql.NullString{
+				String: item.Description,
+				Valid:  true,
+			},
+			Url:         item.Link,
+			PublishedAt: publishedAt.Time,
+		})
+
+		if err != nil {
+			if strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
+				continue
+			}
+			log.Printf("Couldn't create post: %v", err)
+			continue
+		}
+
 	}
 	log.Printf("Feed %s collected, %v posts found", feed.Name, len(feedData.Channel.Item))
+
+}
+
+func handlerRemoveFeed(s *state, cmd command) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("Usage: %s <feed-url>", cmd.Name)
+	}
+
+	feedURL := cmd.Args[0]
+
+	feed, err := s.db.GetFeedByURL(context.Background(), feedURL)
+	if err != nil {
+		return fmt.Errorf("Failed to find feed: %v", err)
+	}
+
+	err = s.db.RemoveFeed(context.Background(), feed.ID)
+	if err != nil {
+		return fmt.Errorf("Failed to remove feed: %v", err)
+	}
+
+	fmt.Printf("Successfully deleted: %s\n", feed.Name)
+	return nil
 
 }
 
