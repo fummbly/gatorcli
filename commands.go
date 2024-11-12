@@ -1,24 +1,38 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
-type command struct {
+type input struct {
 	Name string
 	Args []string
 }
 
+type command struct {
+	handler func(*state, input) error
+	descr   string
+}
+
 type commands struct {
-	registeredCommands map[string]func(*state, command) error
+	registeredCommands map[string]command
 }
 
-func (c *commands) register(name string, f func(*state, command) error) {
-	c.registeredCommands[name] = f
+func (c *commands) register(name string, cmd command) {
+	c.registeredCommands[name] = cmd
 }
 
-func (c *commands) run(s *state, cmd command) error {
-	f, ok := c.registeredCommands[cmd.Name]
+func (c *commands) help() {
+	for cmdName, cmd := range c.registeredCommands {
+		fmt.Printf("%s: %s\n", cmdName, cmd.descr)
+	}
+}
+
+func (c *commands) run(s *state, in input) error {
+	cmd, ok := c.registeredCommands[in.Name]
 	if !ok {
 		return errors.New("command not found")
 	}
-	return f(s, cmd)
+	return cmd.handler(s, in)
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func handlerReset(s *state, cmd command) error {
+func handlerReset(s *state, cmd input) error {
 	err := s.db.DeleteUsers(context.Background())
 	if err != nil {
 		return fmt.Errorf("Error deleting all users: %v", err)

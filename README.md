@@ -1,9 +1,11 @@
-# Gator RSS Aggregator 
+# Gator RSS Aggregator
 
 ## What is Gator
+
 **Gator** is a RSS feed Aggregator for the terminal to read blog posts in the terminal
 
 ## Dependencies
+
 **Gator** requires both [goose](https://github.com/pressly/goose) and [postgres](https://www.postgresql.org/)
 
 ### To install goose:
@@ -34,16 +36,15 @@ sudo passwd postgres
 
 ### Start server for postgres:
 
-- Mac: ```brew services start postgresql```
-- Linux: ```sudo service postgresql start```
-
+- Mac: `brew services start postgresql`
+- Linux: `sudo service postgresql start`
 
 ### Enter psql shell:
 
-- Mac: ```psql postgres```
-- Linux ```sudo -u postgres psql```
+- Mac: `psql postgres`
+- Linux `sudo -u postgres psql`
 
-### Create a database called ```gator```:
+### Create a database called `gator`:
 
 ```
 CREATE DATABASE gator;
@@ -61,7 +62,8 @@ CREATE DATABASE gator;
 ALTER USER postgres PASSWORD 'postgres';
 
 ```
-Exit with ```exit```
+
+Exit with `exit`
 
 ## Setup goose
 
@@ -80,8 +82,9 @@ cd sql/schema
 ### Migrate up with goose:
 
 Your postgres connection is dependent on how you setup the postgres server
-- Mac: ```postgres://<username>:@localhost:5432/gator```
-- Linux: ```postgres://postgres:postgres@localhost/gator```
+
+- Mac: `postgres://<username>:@localhost:5432/gator`
+- Linux: `postgres://postgres:postgres@localhost/gator`
 
 ### Migrate:
 
@@ -91,7 +94,8 @@ goose postgres <connection-string> up
 
 ### Create the config file:
 
-Create a config file in your home directory with 
+Create a config file in your home directory with
+
 ```
 {
   "db_url": <connection-string>
@@ -102,19 +106,19 @@ Create a config file in your home directory with
 
 ### User Controls
 
-Create a user with the ```register``` command
+Create a user with the `register` command
 
 ```
 gatorcli register <name>
 ```
 
-List all registered users with the ```users``` command
+List all registered users with the `users` command
 
 ```
 gatorcli users
 ```
 
-Switch to another registered user with the ```login``` command
+Switch to another registered user with the `login` command
 
 ```
 gatorcli login <name>
@@ -122,13 +126,13 @@ gatorcli login <name>
 
 ### Feed Controls
 
-Add a feed by using the ```addfeed``` command, the current user with automatically subscribed to the feed
+Add a feed by using the `addfeed` command, the current user with automatically subscribed to the feed
 
 ```
 gatorcli addfeed <feed-name> <feed-url>
 ```
 
-List all the added feeds with the ```feeds``` command
+List all the added feeds with the `feeds` command
 
 ```
 gatorcli feeds
@@ -136,19 +140,19 @@ gatorcli feeds
 
 ### Following Controls
 
-Follow an added feed with the ```follow``` command for the current user
+Follow an added feed with the `follow` command for the current user
 
 ```
 gatorcli follow <feed-url>
 ```
 
-Unfollow a feed with the ```follow``` command for the current user
+Unfollow a feed with the `follow` command for the current user
 
 ```
 gatorcli unfollow <feed-url>
 ```
 
-List the feeds the current user is following with the ```following``` command
+List the feeds the current user is following with the `following` command
 
 ```
 gatorcli following
@@ -156,9 +160,9 @@ gatorcli following
 
 ### Aggregator
 
-Aggregate feeds with the ```agg``` command by a time interval
+Aggregate feeds with the `agg` command by a time interval
 
-The time interval is formated like ```eg: 1s, 1m, 1h```
+The time interval is formated like `eg: 1s, 1m, 1h`
 
 ```
 gatorcli agg <time-interval
@@ -166,9 +170,16 @@ gatorcli agg <time-interval
 
 ### Browse
 
-Browse posts of followed feeds with the ```browse``` command
+Browse posts of followed feeds with the `browse` command
 
 ```
 gatorcli browse
 ```
 
+### Help
+
+Get help of all commands with `help`
+
+```
+gatorcli help
+```

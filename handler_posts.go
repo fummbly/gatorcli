@@ -40,7 +40,7 @@ func createPost(db *database.Queries, feedID int32, rssItem rss.RSSItem) (databa
 
 }
 
-func handlerBrowse(s *state, cmd command, user database.User) error {
+func handlerBrowse(s *state, cmd input, user database.User) error {
 	if len(cmd.Args) > 1 {
 		return fmt.Errorf("Usage: %s <limit> (optional)", cmd.Name)
 	}

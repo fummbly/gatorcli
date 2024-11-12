@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerLogin(s *state, cmd command) error {
+func handlerLogin(s *state, cmd input) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
@@ -30,7 +30,7 @@ func handlerLogin(s *state, cmd command) error {
 	return nil
 }
 
-func handlerRegister(s *state, cmd command) error {
+func handlerRegister(s *state, cmd input) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
@@ -67,7 +67,7 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
-func handlerUsers(s *state, cmd command) error {
+func handlerUsers(s *state, cmd input) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {
 		return fmt.Errorf("Error getting users from database: %v", err)

@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func handlerAgg(s *state, cmd command) error {
+func handlerAgg(s *state, cmd input) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("Usage: %s <time_between_reps>", cmd.Name)
 	}
@@ -92,7 +92,7 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 
 }
 
-func handlerRemoveFeed(s *state, cmd command) error {
+func handlerRemoveFeed(s *state, cmd input) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("Usage: %s <feed-url>", cmd.Name)
 	}
@@ -114,7 +114,7 @@ func handlerRemoveFeed(s *state, cmd command) error {
 
 }
 
-func handlerAddFeed(s *state, cmd command, user database.User) error {
+func handlerAddFeed(s *state, cmd input, user database.User) error {
 	if len(cmd.Args) != 2 {
 		return fmt.Errorf("Usage: %s <name> <url", cmd.Name)
 	}
@@ -156,7 +156,7 @@ func handlerAddFeed(s *state, cmd command, user database.User) error {
 
 }
 
-func handlerGetFeeds(s *state, cmd command) error {
+func handlerGetFeeds(s *state, cmd input) error {
 
 	feeds, err := s.db.GetFeeds(context.Background())
 	if err != nil {
